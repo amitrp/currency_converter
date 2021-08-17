@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 
 import java.io.Console;
 
@@ -15,9 +14,7 @@ public class Application implements CommandLineRunner {
     CurrencyConverterService currencyConverterService;
 
     public static void main(String[] args) {
-        SpringApplication application = new SpringApplication(Application.class);
-        application.setWebEnvironment(false);
-        ApplicationContext ctx = application.run(args);
+        SpringApplication.run(Application.class, args);
     }
 
     @Override
