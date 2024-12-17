@@ -1,23 +1,20 @@
 package com.amitph.curexchange.service;
 
 import com.google.common.collect.Table;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class CurrencyConverterService {
 
-    @Autowired
-    Table<String, String, Double> currencyRates;
+    private final Table<String, String, Double> currencyRates;
 
-    @Autowired
-    Table<String, String, String> currencyCrossReference;
+    private final Table<String, String, String> currencyCrossReference;
 
-    @Autowired
-    InputValidator validator;
+    private final InputValidator validator;
 
-    @Autowired
-    CurrencyFormatter formatter;
+    private final CurrencyFormatter formatter;
 
     public String convertCurrency(String input) {
         if (!validator.isInputValid(input)) return "Invalid Input";
@@ -29,14 +26,12 @@ public class CurrencyConverterService {
 
         Double rate = calculateRate(base, term);
         return printableResult(base, term, ccy1, rate);
-
     }
 
     private String printableResult(String base, String term, Double ccy1, Double rate) {
-        return
-                rate == 0
-                        ? "Unable to find rate for " + base + "/" + term
-                        : base + " " + ccy1 + " = " + term + " " + (formatter.format(term, ccy1 * rate));
+        return rate == 0
+                ? "Unable to find rate for " + base + "/" + term
+                : base + " " + ccy1 + " = " + term + " " + (formatter.format(term, ccy1 * rate));
     }
 
     private Double calculateRate(String base, String term) {
@@ -46,15 +41,18 @@ public class CurrencyConverterService {
     }
 
     private Double calculateRateDirect(String base, String term) {
-        return currencyRates.contains(base, term) ? currencyRates.get(base, term) : (
-                currencyRates.contains(term, base) ? (1 / currencyRates.get(term, base)) : 0d);
+        return currencyRates.contains(base, term)
+                ? currencyRates.get(base, term)
+                : (currencyRates.contains(term, base) ? (1 / currencyRates.get(term, base)) : 0d);
     }
 
     private Double calculateRateCrossReference(String base, String term) {
         if (currencyCrossReference.contains(base, term))
-            return calculateRate(base, currencyCrossReference.get(base, term)) * calculateRate(currencyCrossReference.get(base, term), term);
+            return calculateRate(base, currencyCrossReference.get(base, term))
+                    * calculateRate(currencyCrossReference.get(base, term), term);
         else if (currencyCrossReference.contains(term, base))
-            return calculateRate(base, currencyCrossReference.get(term, base)) * calculateRate(currencyCrossReference.get(term, base), term);
+            return calculateRate(base, currencyCrossReference.get(term, base))
+                    * calculateRate(currencyCrossReference.get(term, base), term);
         else return 0d;
     }
 }

@@ -1,25 +1,26 @@
 package com.amitph.curexchange.service;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class InputValidator {
-    public Boolean isInputValid(String inputString) {
-        if (StringUtils.isEmpty(inputString))
-            return FALSE;
+    public boolean isInputValid(String inputString) {
+
+        if (!StringUtils.hasText(inputString)) {
+            return false;
+        }
 
         String[] inputArray = inputString.trim().split("\\s+");
-        if (inputArray.length != 4)
-            return FALSE;
+        return inputArray.length == 4 && isNumeric(inputArray[1]);
+    }
 
+    private boolean isNumeric(String value) {
         try {
-            Double.parseDouble(inputArray[1]);
-        } catch (NumberFormatException nfe) {
-            return FALSE;
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
-        return TRUE;
     }
 }

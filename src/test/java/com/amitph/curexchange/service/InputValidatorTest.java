@@ -1,17 +1,17 @@
 package com.amitph.curexchange.service;
 
 import static java.lang.Boolean.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class InputValidatorTest {
-    InputValidator validator;
+    private InputValidator validator;
 
-    @Before
+    @BeforeEach
     public void setup() {
         validator = new InputValidator();
     }
@@ -25,8 +25,9 @@ public class InputValidatorTest {
         inputStringExpectedBoolean.put("  AUD 100.00 in USD  ", TRUE);
         inputStringExpectedBoolean.put("AUD     100.00 in        USD", TRUE);
 
-        for (String input : inputStringExpectedBoolean.keySet())
-            Assert.assertEquals(inputStringExpectedBoolean.get(input), validator.isInputValid(input));
+        for (String input : inputStringExpectedBoolean.keySet()) {
+            assertEquals(inputStringExpectedBoolean.get(input), validator.isInputValid(input));
+        }
     }
 
     @Test
@@ -36,6 +37,6 @@ public class InputValidatorTest {
         inputStringExpectedBoolean.put("AUD  USD", FALSE);
 
         for (String input : inputStringExpectedBoolean.keySet())
-            Assert.assertEquals(inputStringExpectedBoolean.get(input), validator.isInputValid(input));
+            assertEquals(inputStringExpectedBoolean.get(input), validator.isInputValid(input));
     }
 }

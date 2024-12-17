@@ -1,24 +1,24 @@
 package com.amitph.curexchange.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CurrencyFormatterTest {
-    CurrencyFormatter formatter;
+    private CurrencyFormatter formatter;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        formatter = new CurrencyFormatter();
         Map<String, Integer> currencyFormats = new HashMap<>();
-        formatter.currencyFormats = currencyFormats;
         currencyFormats.put("AUD", 2);
         currencyFormats.put("JPY", 0);
+
+        formatter = new CurrencyFormatter(currencyFormats);
     }
 
     @Test
@@ -31,7 +31,9 @@ public class CurrencyFormatterTest {
 
         for (String currency : currencyAmountExpectedAmount.rowKeySet()) {
             for (Double amount : currencyAmountExpectedAmount.row(currency).keySet()) {
-                assertEquals(currencyAmountExpectedAmount.get(currency, amount), formatter.format(currency, amount));
+                assertEquals(
+                        currencyAmountExpectedAmount.get(currency, amount),
+                        formatter.format(currency, amount));
             }
         }
     }
@@ -44,7 +46,9 @@ public class CurrencyFormatterTest {
 
         for (String currency : currencyAmountExpectedAmount.rowKeySet()) {
             for (Double amount : currencyAmountExpectedAmount.row(currency).keySet()) {
-                assertEquals(currencyAmountExpectedAmount.get(currency, amount), formatter.format(currency, amount));
+                assertEquals(
+                        currencyAmountExpectedAmount.get(currency, amount),
+                        formatter.format(currency, amount));
             }
         }
     }

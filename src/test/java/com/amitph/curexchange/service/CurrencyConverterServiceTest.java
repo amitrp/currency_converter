@@ -2,45 +2,53 @@ package com.amitph.curexchange.service;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.Double.parseDouble;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CurrencyConverterServiceTest {
-    CurrencyConverterService service;
+    private CurrencyConverterService service;
 
-    @Before
+    private InputValidator validator;
+
+    private CurrencyFormatter formatter;
+    private Table<String, String, Double> currencyRates;
+    private Table<String, String, String> currencyCrossReference;
+
+    @BeforeEach
     public void setup() {
-        service = new CurrencyConverterService();
-        service.currencyRates = mockCurrencyRates();
-        service.currencyCrossReference = mockCurrencyCrossReferences();
-        service.formatter = mock(CurrencyFormatter.class);
-        service.validator = mock(InputValidator.class);
+        currencyRates = mockCurrencyRates();
+        currencyCrossReference = mockCurrencyCrossReferences();
+        formatter = mock(CurrencyFormatter.class);
+        validator = mock(InputValidator.class);
+        service =
+                new CurrencyConverterService(
+                        currencyRates, currencyCrossReference, validator, formatter);
     }
 
     @Test
     public void validatorIsCalledWhenServiceIsCalled() {
         String inputString = "AUD 1000 IN USD";
         service.convertCurrency(inputString);
-        verify(service.validator).isInputValid(inputString);
+        verify(validator).isInputValid(inputString);
     }
 
     @Test
     public void formatterIsCalledWhenServiceIsCalledWithValidInput() {
         String inputString = "AUD 100.00 in USD";
-        when(service.validator.isInputValid(inputString)).thenReturn(TRUE);
+        when(validator.isInputValid(inputString)).thenReturn(TRUE);
         service.convertCurrency(inputString);
-        verify(service.formatter).format("USD", 83.71);
+        verify(formatter).format("USD", 83.71);
     }
 
     @Test
@@ -52,15 +60,16 @@ public class CurrencyConverterServiceTest {
         String base, term;
         Double amount;
         for (String input : inputOutput.keySet()) {
-            when(service.validator.isInputValid(input)).thenReturn(TRUE);
+            when(validator.isInputValid(input)).thenReturn(TRUE);
             String[] arr = input.split("\\s+");
             base = arr[0];
             amount = parseDouble(arr[1]);
             term = arr[3];
-            when(service.formatter.format(term, amount * service.currencyRates.get(base, term)))
+            when(formatter.format(term, amount * currencyRates.get(base, term)))
                     .thenReturn(
-                            (new BigDecimal(amount * service.currencyRates.get(base, term)).setScale(2, RoundingMode.HALF_EVEN)).doubleValue()
-                    );
+                            (new BigDecimal(amount * currencyRates.get(base, term))
+                                            .setScale(2, RoundingMode.HALF_EVEN))
+                                    .doubleValue());
             assertEquals(inputOutput.get(input), service.convertCurrency(input));
         }
     }
@@ -72,7 +81,7 @@ public class CurrencyConverterServiceTest {
         inputOutput.put("EUR 100.00 in JPY", "Unable to find rate for EUR/JPY");
 
         for (String input : inputOutput.keySet()) {
-            when(service.validator.isInputValid(input)).thenReturn(TRUE);
+            when(validator.isInputValid(input)).thenReturn(TRUE);
             assertEquals(inputOutput.get(input), service.convertCurrency(input));
         }
     }
@@ -84,17 +93,18 @@ public class CurrencyConverterServiceTest {
         inputOutput.put("USD 100.00 in EUR", "USD 100.0 = EUR 81.2");
 
         String base, term;
-        Double amount;
+        double amount;
         for (String input : inputOutput.keySet()) {
-            when(service.validator.isInputValid(input)).thenReturn(TRUE);
+            when(validator.isInputValid(input)).thenReturn(TRUE);
             String[] arr = input.split("\\s+");
             base = arr[0];
             amount = parseDouble(arr[1]);
             term = arr[3];
-            when(service.formatter.format(term, amount * (1 / service.currencyRates.get(term, base))))
+            when(formatter.format(term, amount * (1 / currencyRates.get(term, base))))
                     .thenReturn(
-                            (new BigDecimal(amount * (1 / service.currencyRates.get(term, base))).setScale(2, RoundingMode.HALF_EVEN)).doubleValue()
-                    );
+                            (new BigDecimal(amount * (1 / currencyRates.get(term, base)))
+                                            .setScale(2, RoundingMode.HALF_EVEN))
+                                    .doubleValue());
             assertEquals(inputOutput.get(input), service.convertCurrency(input));
         }
     }
@@ -104,16 +114,15 @@ public class CurrencyConverterServiceTest {
         String inputString = "AUD 100.00 in DKK";
         String expected = "AUD 100.0 = DKK 505.76";
 
-        when(service.validator.isInputValid(inputString)).thenReturn(TRUE);
+        when(validator.isInputValid(inputString)).thenReturn(TRUE);
         String[] arr = inputString.split("\\s+");
         String term = arr[3];
-        when(service.formatter.format(term, 505.7606617945594))
+        when(formatter.format(term, 505.7606617945594))
                 .thenReturn(
-                        (new BigDecimal(505.7606617945594).setScale(2, RoundingMode.HALF_EVEN)).doubleValue()
-                );
+                        (new BigDecimal(505.7606617945594).setScale(2, RoundingMode.HALF_EVEN))
+                                .doubleValue());
         assertEquals(expected, service.convertCurrency(inputString));
     }
-
 
     private Table<String, String, String> mockCurrencyCrossReferences() {
         Table<String, String, String> currencyCrossReferences = HashBasedTable.create();

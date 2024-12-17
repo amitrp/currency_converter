@@ -1,17 +1,16 @@
 package com.amitph.curexchange;
 
 import com.amitph.curexchange.service.CurrencyConverterService;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.Console;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.Console;
-
 @SpringBootApplication
+@RequiredArgsConstructor
 public class Application implements CommandLineRunner {
-    @Autowired
-    CurrencyConverterService currencyConverterService;
+    private final CurrencyConverterService currencyConverterService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

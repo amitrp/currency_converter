@@ -1,9 +1,9 @@
 ## Currency Converter
 ##### Libraries/Plug-ins Involved
-- Java 8
+- Java 21
 - Maven
 - Maven Wrapper
-- Spring Boot
+- Spring Boot 3.4.0
 - Google Guava Table ([docs](https://google.github.io/guava/releases/19.0/api/docs/com/google/common/collect/Table.html))
 - JUnit & Mockito
 
@@ -71,9 +71,3 @@ Once the application is started, currency conversion command can be provided lik
 ```
 Any invalid input will result in `invalid input` response
 
-##### Exiting the Application
-The application will keep on asking for next input. To exit the application simply type `ctl + c` or `exit`
-
-```aidl
-> exit
-```
